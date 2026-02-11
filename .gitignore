@@ -1,0 +1,22 @@
+# Output of the build process
+dist
+
+# personal research files
+research
+
+# MacOS specific files
+.DS_Store
+
+# Ignore the .idea directory, which contains project-specific settings for JetBrains IDEs
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/dbnavigator.xml
+/.idea/persistence.iml
+
+# Ignore the inspection profiles, which contain code analysis settings for JetBrains IDEs
+/.idea/inspectionProfiles/profiles_settings.xml
+
+# virtual environment for Python projects
+.venv
