@@ -1,0 +1,16 @@
+[
+  {
+    "_comment": "Dates must be DD-MM-YYYY. Items missing title/summary/date are ignored.",
+    "_comment": "Latest updates are at the top. This file is read by labs.edyant.com to display updates on the homepage."
+  },
+  {
+    "date": "10-02-2026",
+    "title": "Persistence",
+    "summary": "Research in progress for `persistence-2.0.0-alpha`. \nSoon to arrive."
+  },
+  {
+    "date": "07-04-2025",
+    "title": "Updates",
+    "summary": "Check here for the latest updates. \nDates are formatted as day-month-year (DD-MM-YYYY)."
+  }
+]
