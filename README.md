@@ -21,7 +21,7 @@ Early research and framework design. APIs and storage formats are expected to ch
 |--------------------|-----------------------------------------------------------------------------------------------------------------|
 | Hardware           | CPU-first; no GPU or CUDA required                                                                              |
 | Acceleration       | Optional (hardware-agnostic)                                                                                    |
-| Project Name       | `edyant-persistence`                                                                                            |
+| Project Name       | `edyant`                                                                                            |
 | Description        | Framework for AI systems that maintain continuity across interactions, contexts, and time                       |
 | Python Requirement | Python `>= 3.11`                                                                                                |
 | License            | [Apache License 2.0](LICENSE)                                                                                   |
@@ -31,7 +31,7 @@ Early research and framework design. APIs and storage formats are expected to ch
 ## Install
 
 ```bash
-python -m pip install edyant-persistence
+python -m pip install edyant
 ```
 
 Test releases (TestPyPI):
@@ -40,7 +40,24 @@ Test releases (TestPyPI):
 python -m pip install \
   --index-url https://pypi.org/simple \
   --extra-index-url https://test.pypi.org/simple/ \
-  edyant-persistence
+  edyant
+```
+
+## How users will import
+
+### Complete framework:
+```python
+import edyant
+```
+
+### Specific subsystems:
+
+```python
+from edyant import core
+from edyant import ethics
+from edyant import persistence
+from edyant import persona
+from edyant import umwelt
 ```
 
 ## Learn more
