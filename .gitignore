@@ -20,3 +20,4 @@ research
 
 # virtual environment for Python projects
 .venv
+/.idea/edyant.iml
