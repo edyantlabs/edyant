@@ -1,3 +1,5 @@
+"""Dataset loaders for JSON, JSONL, and CSV prompt suites."""
+
 from __future__ import annotations
 
 import csv
@@ -9,6 +11,7 @@ from ..types import Dataset, PromptExample
 
 
 def load_dataset(path: str | Path, name: str | None = None) -> Dataset:
+    """Load a dataset from a file path, inferring format by extension."""
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(f"Dataset not found: {path}")
@@ -24,6 +27,7 @@ def load_dataset(path: str | Path, name: str | None = None) -> Dataset:
 
 
 def _load_json(path: Path, name: str | None = None) -> Dataset:
+    """Load a dataset from a JSON list or object with examples."""
     with path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
 
@@ -46,6 +50,7 @@ def _load_json(path: Path, name: str | None = None) -> Dataset:
 
 
 def _load_jsonl(path: Path, name: str | None = None) -> Dataset:
+    """Load a dataset from JSON Lines (one object per line)."""
     examples: list[PromptExample] = []
     with path.open("r", encoding="utf-8") as handle:
         for index, line in enumerate(handle, 1):
@@ -63,6 +68,7 @@ def _load_jsonl(path: Path, name: str | None = None) -> Dataset:
 
 
 def _load_csv(path: Path, name: str | None = None) -> Dataset:
+    """Load a dataset from CSV with a prompt column."""
     examples: list[PromptExample] = []
     with path.open("r", encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
@@ -74,6 +80,7 @@ def _load_csv(path: Path, name: str | None = None) -> Dataset:
 
 
 def _normalize_examples(raw_examples: Iterable[dict[str, Any]]) -> list[PromptExample]:
+    """Normalize a list of dict payloads into PromptExample objects."""
     examples: list[PromptExample] = []
     for index, payload in enumerate(raw_examples, 1):
         examples.append(_normalize_example(payload, index))
@@ -81,6 +88,7 @@ def _normalize_examples(raw_examples: Iterable[dict[str, Any]]) -> list[PromptEx
 
 
 def _normalize_example(payload: dict[str, Any], index: int) -> PromptExample:
+    """Normalize a single payload dict into a PromptExample."""
     if not isinstance(payload, dict):
         raise ValueError(f"Dataset item {index} must be an object")
 

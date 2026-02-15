@@ -1,3 +1,9 @@
+"""Benchmarking toolkit for edyant.
+
+Provides adapters, dataset loaders, evaluators, runners, and result writers.
+Use this module as the main entry point for running benchmark suites.
+"""
+
 from .adapters import (
     AdapterError,
     ModelAdapter,

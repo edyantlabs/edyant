@@ -1,3 +1,5 @@
+"""Result writer implementations."""
+
 from .writers import InMemoryResultWriter, JsonResultWriter, JsonlResultWriter, ResultWriter
 
 __all__ = [

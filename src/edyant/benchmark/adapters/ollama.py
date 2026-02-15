@@ -1,3 +1,5 @@
+"""Ollama adapter for local model execution."""
+
 from __future__ import annotations
 
 import json
@@ -12,6 +14,8 @@ from ..types import ModelOutput
 
 
 class OllamaAdapter(ModelAdapter):
+    """Adapter for the Ollama HTTP API."""
+
     def __init__(
         self,
         model: str,
@@ -28,6 +32,7 @@ class OllamaAdapter(ModelAdapter):
         self._retry_sleep = retry_sleep
 
     def generate(self, prompt: str, **kwargs: Any) -> ModelOutput:
+        """Send a prompt to Ollama and return the response."""
         payload = {
             "model": self._model,
             "prompt": prompt,

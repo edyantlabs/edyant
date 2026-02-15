@@ -1,3 +1,5 @@
+"""Model adapter registry and built-in adapters."""
+
 from .base import (
     AdapterError,
     ModelAdapter,

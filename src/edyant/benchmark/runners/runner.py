@@ -1,3 +1,5 @@
+"""Benchmark runner that orchestrates datasets, models, and evaluators."""
+
 from __future__ import annotations
 
 import time
@@ -12,6 +14,8 @@ from ..types import Dataset, RunRecord
 
 
 class BenchmarkRunner:
+    """Run a dataset against a model adapter and evaluators."""
+
     def __init__(
         self,
         adapter: ModelAdapter,
@@ -30,9 +34,11 @@ class BenchmarkRunner:
 
     @property
     def run_id(self) -> str:
+        """Return the run identifier."""
         return self._run_id
 
     def run(self, dataset: Dataset, writer: ResultWriter | None = None) -> list[RunRecord]:
+        """Execute a dataset and return run records."""
         records: list[RunRecord] = []
         run_metadata = {
             "adapter": self._adapter.__class__.__name__,
