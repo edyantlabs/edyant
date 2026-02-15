@@ -14,6 +14,7 @@ research
 /.idea/vcs.xml
 /.idea/dbnavigator.xml
 /.idea/persistence.iml
+/.idea/edyant.iml
 
 # Ignore the inspection profiles, which contain code analysis settings for JetBrains IDEs
 /.idea/inspectionProfiles/profiles_settings.xml
