@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "edyant"
-version = "0.0.1-alpha1"
+version = "0.0.1a1"
 description = "Framework for embodied AI systems that maintain continuity across physical interactions, environments, and time."
 readme = "README.md"
 requires-python = ">=3.11"

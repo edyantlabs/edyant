@@ -53,6 +53,7 @@ import edyant
 ### Specific subsystems:
 
 ```python
+from edyant import benchmark
 from edyant import core
 from edyant import ethics
 from edyant import persistence
@@ -62,4 +63,4 @@ from edyant import umwelt
 
 ## Learn more
 
-See [about.md](about.md) for the full framework narrative, research threads, and governance considerations. The license is in [LICENSE](LICENSE).
+See [about.md](about_persistence.md) for the full framework narrative, research threads, and governance considerations. The license is in [LICENSE](LICENSE).
