@@ -227,7 +227,7 @@ These steps run the ethics benchmark stack locally against Ollama.
 
 Prerequisites:
 - Python 3.11+
-- Ollama installed and running
+- Ollama installed and running (see `docs/setting_ollama.md`)
 
 ### 1. Create and activate a virtual environment:
 
