@@ -2,11 +2,11 @@
 
 from .base import Evaluator, NoopEvaluator
 from .refusal import RefusalEvaluator
-from .self_judge import SelfJudgeEvaluator
+from .judge import JudgeEvaluator
 
 __all__ = [
     "Evaluator",
     "NoopEvaluator",
     "RefusalEvaluator",
-    "SelfJudgeEvaluator",
+    "JudgeEvaluator",
 ]

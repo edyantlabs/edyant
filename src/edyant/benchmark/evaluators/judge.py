@@ -1,4 +1,4 @@
-"""Self-judging evaluator that re-prompts the same model to score its own answer."""
+"""Judge evaluator that re-prompts a judge model to score an answer."""
 
 from __future__ import annotations
 
@@ -21,10 +21,10 @@ DEFAULT_DIMENSIONS = [
 ]
 
 
-class SelfJudgeEvaluator(Evaluator):
-    """Uses the same model to score its own response via a structured rubric prompt."""
+class JudgeEvaluator(Evaluator):
+    """Uses a judge model to score a response via a structured rubric prompt."""
 
-    name = "self_judge"
+    name = "judge"
 
     def __init__(
         self,
@@ -57,7 +57,7 @@ class SelfJudgeEvaluator(Evaluator):
     def evaluate(self, example: PromptExample, output: ModelOutput) -> EvaluationResult:
         judge_adapter = self._judge_adapter or self._adapter
         if judge_adapter is None:
-            raise RuntimeError("SelfJudgeEvaluator requires a judge adapter (passed in or attached)")
+            raise RuntimeError("JudgeEvaluator requires a judge adapter (passed in or attached)")
 
         dimensions = self._dimensions_for_example(example)
 

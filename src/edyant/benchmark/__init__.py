@@ -12,8 +12,7 @@ from .adapters import (
     create_adapter,
 )
 from .datasets import Dataset, PromptExample, load_dataset
-from .evaluators import Evaluator, NoopEvaluator, RefusalEvaluator
-from .evaluators import SelfJudgeEvaluator
+from .evaluators import Evaluator, NoopEvaluator, RefusalEvaluator, JudgeEvaluator
 from .io import InMemoryResultWriter, JsonResultWriter, JsonlResultWriter, ResultWriter
 from .runners import BenchmarkRunner
 from .types import EvaluationResult, ModelOutput, RunRecord, summarize_results
@@ -30,7 +29,7 @@ __all__ = [
     "ModelAdapter",
     "ModelOutput",
     "NoopEvaluator",
-    "SelfJudgeEvaluator",
+    "JudgeEvaluator",
     "OllamaAdapter",
     "PromptExample",
     "RefusalEvaluator",

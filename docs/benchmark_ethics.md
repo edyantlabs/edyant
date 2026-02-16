@@ -50,7 +50,7 @@ Optional fields:
 - `expect_refusal` or `expected_refusal` or `should_refuse`: boolean hint for evaluators.
 - Any other fields are treated as `metadata` and preserved in results.
 
-Extended ethics records (like `research/benchmark_ethics_sample.json`) can include rich fields such as `subcategory`, `difficulty`, `ethical_dimensions`, `layered_tensions`, `stakeholder_map`, `power_dynamics`, `required_reasoning_steps`, `expected_ethical_response`, `red_flags`, `common_failure_modes`, `severity`, `cultural_context`, `cultural_variation`, `temporal_factors`, `epistemic_status`, `expert_disagreement_expected`, `related_regulations`, `evaluation_rubric`, and `explanation`. The loader keeps all of these in `example.metadata` so evaluators (e.g., `SelfJudgeEvaluator`) can use them without schema changes.
+Extended ethics records (like `research/benchmark_ethics_sample.json`) can include rich fields such as `subcategory`, `difficulty`, `ethical_dimensions`, `layered_tensions`, `stakeholder_map`, `power_dynamics`, `required_reasoning_steps`, `expected_ethical_response`, `red_flags`, `common_failure_modes`, `severity`, `cultural_context`, `cultural_variation`, `temporal_factors`, `epistemic_status`, `expert_disagreement_expected`, `related_regulations`, `evaluation_rubric`, and `explanation`. The loader keeps all of these in `example.metadata` so evaluators (e.g., `JudgeEvaluator`) can use them without schema changes.
 
 ### JSON list example
 
@@ -137,9 +137,9 @@ To integrate other providers, create a new adapter that implements `generate(pro
 
 ## Evaluators
 
-Evaluators score responses. For ethics benchmarks, the primary evaluator is `SelfJudgeEvaluator`, which grades an answer against each item’s `evaluation_rubric`, `red_flags`, and `common_failure_modes`.
+Evaluators score responses. For ethics benchmarks, the primary evaluator is `JudgeEvaluator`, which grades an answer against each item’s `evaluation_rubric`, `red_flags`, and `common_failure_modes`.
 
-You need to specify a **separate judge model** (two-model) by passing a dedicated judge adapter into `SelfJudgeEvaluator`. This reduces self-grade bias. Single-model judging is discouraged.
+You need to specify a **separate judge model** (two-model) by passing a dedicated judge adapter into `JudgeEvaluator`. This reduces self-grade bias. Single-model judging is discouraged.
 
 > `RefusalEvaluator` is still available if you want explicit refusal detection, but it is no longer required for the ethics flow.
 
@@ -158,7 +158,7 @@ from edyant.benchmark import (
     JsonlResultWriter,
     load_dataset,
     OllamaAdapter,
-    SelfJudgeEvaluator,
+    JudgeEvaluator,
 )
 
 dataset = load_dataset("/path/to/ethics_prompts.json")
@@ -167,7 +167,7 @@ judge_adapter = OllamaAdapter(model="qwen2.5:7b", url="http://localhost:11434/ap
 
 runner = BenchmarkRunner(
     adapter=gen_adapter,
-    evaluators=[SelfJudgeEvaluator(judge_adapter=judge_adapter)],
+    evaluators=[JudgeEvaluator(judge_adapter=judge_adapter)],
     throttle_seconds=1.0,
 )
 
@@ -194,7 +194,7 @@ Each record is a `RunRecord` with these fields:
 - `response`, `response_raw`, `latency_ms`
 - `evaluations`, `example_metadata`, `run_metadata`
 
-`SelfJudgeEvaluator` adds:
+`JudgeEvaluator` adds:
 - Per-dimension rubric scores (0–5) for the dimensions present in `evaluation_rubric`.
 - `overall_score` (mean of provided dimensions).
 - `triggered_red_flags` (any red flags or common failure modes the answer hit).
@@ -388,7 +388,7 @@ from edyant.benchmark import (
     BenchmarkRunner,
     JsonlResultWriter,
     OllamaAdapter,
-    SelfJudgeEvaluator,
+    JudgeEvaluator,
     load_dataset,
 )
 
@@ -487,7 +487,7 @@ def main() -> None:
 
     runner = BenchmarkRunner(
         adapter=adapter,
-        evaluators=[SelfJudgeEvaluator(judge_adapter=judge_adapter)],
+        evaluators=[JudgeEvaluator(judge_adapter=judge_adapter)],
     )
 
     # Exclude example_metadata from the serialized output if you want slimmer files.
