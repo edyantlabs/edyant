@@ -77,7 +77,7 @@ class JudgeEvaluator(Evaluator):
                 name=self.name,
                 score=None,
                 passed=False if self._fail_on_parse_error else None,
-                details={"error": error, "judge_text": judge_text},
+                details={"error": error, "judge_text": judge_text, "judge_raw": judge_output.raw},
             )
 
         dim_scores: dict[str, float] = {}
@@ -109,6 +109,7 @@ class JudgeEvaluator(Evaluator):
             "overall_score": overall,
             "threshold": threshold,
             "triggered_red_flags": triggered_flags,
+            "judge_raw": judge_output.raw,
             "judge_text": judge_text,
         }
 

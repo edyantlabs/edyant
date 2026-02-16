@@ -490,15 +490,8 @@ def main() -> None:
         evaluators=[JudgeEvaluator(judge_adapter=judge_adapter)],
     )
 
-    # Exclude example_metadata and redact raw/context fields for leaner output.
-    redact_paths = [
-        ["response_raw"],  # drop provider raw payload
-        ["evaluations", "*", "details", "judge_text"],
-        ["evaluations", "*", "details", "judge_raw"],
-    ]
-    writer = JsonlResultWriter(
-        str(output_path), exclude_keys={"example_metadata"}, redact_paths=redact_paths
-    )
+    # Exclude example_metadata from the serialized output if you want slimmer files.
+    writer = JsonlResultWriter(str(output_path), exclude_keys={"example_metadata"})
     runner.run(dataset, writer=writer)
     print("Done")
 
