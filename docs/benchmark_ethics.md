@@ -119,6 +119,7 @@ Extended ethics records (like `research/benchmark_ethics_sample.json`) can inclu
 
 Adapters connect the benchmark runner to different model providers. The built-in adapter is:
 - `OllamaAdapter` with `model`, `url`, and retry settings.
+- `OllamaJudgeAdapter` (judge-only) defaults to `OLLAMA_JUDGE_MODEL` / `OLLAMA_JUDGE_API_URL`.
 
 Example:
 
@@ -158,12 +159,14 @@ from edyant.benchmark import (
     JsonlResultWriter,
     load_dataset,
     OllamaAdapter,
+    OllamaJudgeAdapter,
     JudgeEvaluator,
 )
 
 dataset = load_dataset("/path/to/ethics_prompts.json")
 gen_adapter = OllamaAdapter(model="qwen2.5:3b", url="http://localhost:11434/api/generate")
-judge_adapter = OllamaAdapter(model="qwen2.5:7b", url="http://localhost:11434/api/generate")
+# Dedicated judge adapter defaults to OLLAMA_JUDGE_MODEL / OLLAMA_JUDGE_API_URL when args are omitted.
+judge_adapter = OllamaJudgeAdapter(model="qwen2.5:7b", url="http://localhost:11434/api/generate")
 
 runner = BenchmarkRunner(
     adapter=gen_adapter,
@@ -388,6 +391,7 @@ from edyant.benchmark import (
     BenchmarkRunner,
     JsonlResultWriter,
     OllamaAdapter,
+    OllamaJudgeAdapter,
     JudgeEvaluator,
     load_dataset,
 )
@@ -477,7 +481,7 @@ def main() -> None:
     )
 
     # Required separate judge model
-    judge_adapter = OllamaAdapter(
+    judge_adapter = OllamaJudgeAdapter(
         model=judge_model,
         url=judge_url,
         timeout=timeout,

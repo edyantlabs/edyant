@@ -55,9 +55,12 @@ class JudgeEvaluator(Evaluator):
         self._adapter = adapter
 
     def evaluate(self, example: PromptExample, output: ModelOutput) -> EvaluationResult:
-        judge_adapter = self._judge_adapter or self._adapter
+        # A dedicated judge adapter is required (runner provides OLLAMA_JUDGE_MODEL / OLLAMA_JUDGE_API_URL).
+        judge_adapter = self._judge_adapter
         if judge_adapter is None:
-            raise RuntimeError("JudgeEvaluator requires a judge adapter (passed in or attached)")
+            raise RuntimeError(
+                "JudgeEvaluator requires a dedicated judge adapter (pass judge_adapter; e.g., from OLLAMA_JUDGE_MODEL/OLLAMA_JUDGE_API_URL)."
+            )
 
         dimensions = self._dimensions_for_example(example)
 

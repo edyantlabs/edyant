@@ -8,6 +8,7 @@ from .adapters import (
     AdapterError,
     ModelAdapter,
     OllamaAdapter,
+    OllamaJudgeAdapter,
     available_adapters,
     create_adapter,
 )
@@ -31,6 +32,7 @@ __all__ = [
     "NoopEvaluator",
     "JudgeEvaluator",
     "OllamaAdapter",
+    "OllamaJudgeAdapter",
     "PromptExample",
     "RefusalEvaluator",
     "ResultWriter",

@@ -64,4 +64,37 @@ class OllamaAdapter(ModelAdapter):
         raise AdapterError(f"Ollama request failed after {self._max_retries} attempts") from last_error
 
 
+class OllamaJudgeAdapter(OllamaAdapter):
+    """Adapter for the judge model using OLLAMA_JUDGE_MODEL and OLLAMA_JUDGE_API_URL."""
+
+    def __init__(
+        self,
+        model: str | None = None,
+        url: str | None = None,
+        timeout: float = 60.0,
+        max_retries: int = 3,
+        retry_sleep: float = 2.0,
+    ) -> None:
+        model = model or os.getenv("OLLAMA_JUDGE_MODEL")
+        if not model:
+            raise ValueError(
+                "OllamaJudgeAdapter requires a model via the 'model' argument or the OLLAMA_JUDGE_MODEL environment variable"
+            )
+
+        url = url or os.getenv("OLLAMA_JUDGE_API_URL")
+        if not url:
+            raise ValueError(
+                "OllamaJudgeAdapter requires a URL via the 'url' argument or the OLLAMA_JUDGE_API_URL environment variable"
+            )
+
+        super().__init__(
+            model=model,
+            url=url,
+            timeout=timeout,
+            max_retries=max_retries,
+            retry_sleep=retry_sleep,
+        )
+
+
 register_adapter("ollama", OllamaAdapter)
+register_adapter("ollama_judge", OllamaJudgeAdapter)
