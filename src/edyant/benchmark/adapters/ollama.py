@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import socket
 import time
 from typing import Any
@@ -19,14 +20,18 @@ class OllamaAdapter(ModelAdapter):
     def __init__(
         self,
         model: str,
-        url: str = "http://localhost:11434/api/generate",
+        url: str | None = None,
         timeout: float = 60.0,
         max_retries: int = 3,
         retry_sleep: float = 2.0,
     ) -> None:
         super().__init__(model)
         self._model = model
-        self._url = url
+        self._url = url or os.getenv("OLLAMA_API_URL")
+        if not self._url:
+            raise ValueError(
+                "OllamaAdapter requires a URL via the 'url' argument or the OLLAMA_API_URL environment variable"
+            )
         self._timeout = timeout
         self._max_retries = max_retries
         self._retry_sleep = retry_sleep
