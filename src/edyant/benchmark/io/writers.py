@@ -36,6 +36,7 @@ class JsonlResultWriter(ResultWriter):
     def write(self, record: RunRecord) -> None:
         """Append a single record to the JSONL file."""
         payload_dict = record.to_dict()
+        self._promote_judge_metadata(payload_dict)
         for key in self._exclude_keys:
             payload_dict.pop(key, None)
         payload = json.dumps(payload_dict, ensure_ascii=False)
@@ -46,6 +47,36 @@ class JsonlResultWriter(ResultWriter):
         """Close the JSONL file handle."""
         if not self._handle.closed:
             self._handle.close()
+
+    @staticmethod
+    def _promote_judge_metadata(payload: dict[str, Any]) -> None:
+        """Move judge metadata out of judge_raw and drop judge_raw."""
+        evaluations = payload.get("evaluations")
+        if not isinstance(evaluations, list):
+            return
+
+        for evaluation in evaluations:
+            if not isinstance(evaluation, dict):
+                continue
+            details = evaluation.get("details")
+            if not isinstance(details, dict):
+                continue
+            judge_raw = details.get("judge_raw")
+            if not isinstance(judge_raw, dict):
+                continue
+
+            # Copy selected fields so they remain available after removing the raw payload.
+            if "model" in judge_raw:
+                details["model"] = judge_raw.get("model")
+            if "created_at" in judge_raw:
+                details["created_at"] = judge_raw.get("created_at")
+            if "done" in judge_raw:
+                details["done"] = judge_raw.get("done")
+            if "done_reason" in judge_raw:
+                details["done_reason"] = judge_raw.get("done_reason")
+
+            # Remove bulky raw payload now that key fields are preserved.
+            details.pop("judge_raw", None)
 
 
 class JsonResultWriter(ResultWriter):
@@ -60,6 +91,7 @@ class JsonResultWriter(ResultWriter):
     def write(self, record: RunRecord) -> None:
         """Collect a record for later JSON serialization."""
         payload = record.to_dict()
+        JsonlResultWriter._promote_judge_metadata(payload)
         for key in self._exclude_keys:
             payload.pop(key, None)
         self._records.append(payload)
