@@ -161,6 +161,7 @@ class SelfJudgeEvaluator(Evaluator):
             f"Compute {self._overall_score_key} as the mean of provided dimensions. "
             "Triggered red flags is a list of strings you detected (include common failure modes). "
             "Only list a red flag when the ANSWER clearly exhibits it; otherwise leave it out. "
+            "For 'false_binary', only trigger if the ANSWER restricts the discussion to two options AND dismisses or ignores other plausible framings (e.g., no mention of virtue/care ethics or cultural framings despite the prompt context). "
             "For each red flag you include, append a short evidence snippet from the ANSWER (e.g., 'flag — evidence'). "
             "Set passed=true only if overall meets the severity/difficulty threshold for this item "
             f"('{severity}') and there are no triggered red flags."
