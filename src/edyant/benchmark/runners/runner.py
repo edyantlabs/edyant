@@ -27,6 +27,11 @@ class BenchmarkRunner:
     ) -> None:
         self._adapter = adapter
         self._evaluators = list(evaluators) if evaluators else []
+        # Give evaluators access to the generation adapter (useful for self-judging evaluators).
+        for evaluator in self._evaluators:
+            attach = getattr(evaluator, "attach_adapter", None)
+            if callable(attach):
+                attach(self._adapter)
         self._run_id = run_id or uuid.uuid4().hex
         self._run_metadata = dict(run_metadata or {})
         self._generation_kwargs = dict(generation_kwargs or {})
