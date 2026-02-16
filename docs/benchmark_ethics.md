@@ -185,22 +185,18 @@ To integrate other providers, create a new adapter that implements `generate(pro
 
 ## Evaluators
 
-Evaluators score responses. For ethics benchmarks, the starting point is `RefusalEvaluator`.
+Evaluators score responses. For ethics benchmarks, the primary evaluator is `SelfJudgeEvaluator`, which grades an answer against each item’s `evaluation_rubric`, `red_flags`, and `common_failure_modes`. It can run:
+- **Single-model** (default): reuse the generation adapter to judge.
+- **Two-model**: pass a separate judge adapter for stricter grading.
 
-New: `SelfJudgeEvaluator` lets the same model grade its own answer against the record’s rubric and red flags (one-model setup). You can later swap in a stronger judge model by providing a different adapter instance to the evaluator (two-model setup, described below).
-
-Behavior:
-- Looks for refusal phrases in the response.
-- Compares against `expect_refusal` if provided.
-- Returns `passed`, `failed`, or `unknown` when no expectation exists.
+`RefusalEvaluator` is still available if you want explicit refusal detection, but it is no longer required for the ethics flow.
 
 Examples:
 
 ```python
-from edyant.benchmark import RefusalEvaluator, SelfJudgeEvaluator
+from edyant.benchmark import SelfJudgeEvaluator
 
-refusal = RefusalEvaluator()
-self_judge = SelfJudgeEvaluator()  # uses same adapter to grade with a rubric
+self_judge = SelfJudgeEvaluator()  # single-model grading
 ```
 
 You can add additional evaluators such as:
@@ -218,7 +214,6 @@ from edyant.benchmark import (
     JsonlResultWriter,
     load_dataset,
     OllamaAdapter,
-    RefusalEvaluator,
     SelfJudgeEvaluator,
 )
 
@@ -226,7 +221,7 @@ dataset = load_dataset("/path/to/ethics_prompts.json")
 adapter = OllamaAdapter(model="qwen2.5:3b")
 runner = BenchmarkRunner(
     adapter=adapter,
-    evaluators=[RefusalEvaluator(), SelfJudgeEvaluator()],
+    evaluators=[SelfJudgeEvaluator()],  # single-model grading
     throttle_seconds=1.0,
 )
 
@@ -389,7 +384,7 @@ from edyant.benchmark import (
     BenchmarkRunner,
     JsonlResultWriter,
     OllamaAdapter,
-    RefusalEvaluator,
+    SelfJudgeEvaluator,
     load_dataset,
 )
 
@@ -397,7 +392,15 @@ from edyant.benchmark import (
 def main() -> None:
     dataset = load_dataset("/Users/arsalan/Developer/Pycharm/benchmark_test/ethics_sample.json")
     adapter = OllamaAdapter(model="qwen2.5:3b")
-    runner = BenchmarkRunner(adapter=adapter, evaluators=[RefusalEvaluator()])
+
+    # Optional: separate judge model for stricter grading
+    judge_adapter = None
+    # judge_adapter = OllamaAdapter(model="qwen2.5:7b", url="http://localhost:11434/api/generate")
+
+    runner = BenchmarkRunner(
+        adapter=adapter,
+        evaluators=[SelfJudgeEvaluator(judge_adapter=judge_adapter)],
+    )
 
     writer = JsonlResultWriter(
         "/Users/arsalan/Developer/Pycharm/benchmark_test/results.jsonl"
