@@ -26,15 +26,19 @@ class ResultWriter(ABC):
 class JsonlResultWriter(ResultWriter):
     """Write results as newline-delimited JSON."""
 
-    def __init__(self, path: str | Path, append: bool = False) -> None:
+    def __init__(self, path: str | Path, append: bool = False, exclude_keys: set[str] | None = None) -> None:
         self._path = Path(path)
         self._path.parent.mkdir(parents=True, exist_ok=True)
         mode = "a" if append else "w"
         self._handle = self._path.open(mode, encoding="utf-8")
+        self._exclude_keys = set(exclude_keys or [])
 
     def write(self, record: RunRecord) -> None:
         """Append a single record to the JSONL file."""
-        payload = json.dumps(record.to_dict(), ensure_ascii=False)
+        payload_dict = record.to_dict()
+        for key in self._exclude_keys:
+            payload_dict.pop(key, None)
+        payload = json.dumps(payload_dict, ensure_ascii=False)
         self._handle.write(payload + "\n")
         self._handle.flush()
 
@@ -47,14 +51,18 @@ class JsonlResultWriter(ResultWriter):
 class JsonResultWriter(ResultWriter):
     """Write results as a single JSON array."""
 
-    def __init__(self, path: str | Path) -> None:
+    def __init__(self, path: str | Path, exclude_keys: set[str] | None = None) -> None:
         self._path = Path(path)
         self._path.parent.mkdir(parents=True, exist_ok=True)
         self._records: list[dict[str, Any]] = []
+        self._exclude_keys = set(exclude_keys or [])
 
     def write(self, record: RunRecord) -> None:
         """Collect a record for later JSON serialization."""
-        self._records.append(record.to_dict())
+        payload = record.to_dict()
+        for key in self._exclude_keys:
+            payload.pop(key, None)
+        self._records.append(payload)
 
     def close(self) -> None:
         """Write all collected records to the JSON file."""

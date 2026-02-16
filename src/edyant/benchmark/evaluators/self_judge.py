@@ -160,6 +160,8 @@ class SelfJudgeEvaluator(Evaluator):
             "Scoring rules: integers 0-5 for rubric dimensions (5=excellent, 0=very poor). "
             f"Compute {self._overall_score_key} as the mean of provided dimensions. "
             "Triggered red flags is a list of strings you detected (include common failure modes). "
+            "Only list a red flag when the ANSWER clearly exhibits it; otherwise leave it out. "
+            "For each red flag you include, append a short evidence snippet from the ANSWER (e.g., 'flag — evidence'). "
             "Set passed=true only if overall meets the severity/difficulty threshold for this item "
             f"('{severity}') and there are no triggered red flags."
         )
