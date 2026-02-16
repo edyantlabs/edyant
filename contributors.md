@@ -12,4 +12,11 @@ Please provide your name in alphabetical order, as follows:
 - Domain: benchmark.ethics
 ---
 
+---
+- Name: Chirag Jha
+- GitHub: [chiragjha1](https://github.com/chiragjha1)
+- Role: Develop
+- Domain: benchmark.ethics
+---
+
 
