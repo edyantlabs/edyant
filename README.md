@@ -1,8 +1,9 @@
-# Persistence & Continuity Framework
+# Edyant Framework
 
-A framework for AI systems that maintain meaningful continuity across interactions, contexts, and time.
+A framework for AI systems that maintain meaningful and ethical continuity across interactions, contexts, and time.
 
-This project treats memory as lived contextual experience so agents can retain skills, world models, and performance history across sessions. The goal is to enable safe, reliable long-term collaboration between humans and AI in shared organizational and personal environments.
+This project treats memory as lived contextual experience so agents can retain skills, world models, and performance history across sessions. 
+The goal is to enable safe, reliable long-term collaboration between humans and AI in shared organizational and personal environments.
 
 ## What it provides
 
@@ -10,10 +11,6 @@ This project treats memory as lived contextual experience so agents can retain s
 - Skill retention across sessions and multi-session task resumption
 - Performance awareness, drift/degradation monitoring, and adaptive compensation
 - Safety-first incident memory, explainable recall, and governance-aware retention
-
-## Status
-
-Early research and framework design. APIs and storage formats are expected to change.
 
 ## Technical details
 
@@ -57,10 +54,11 @@ from edyant import benchmark
 from edyant import core
 from edyant import ethics
 from edyant import persistence
-from edyant import persona
-from edyant import umwelt
 ```
 
-## Learn more
+> **edyant.persona** and **edyant.umwelt** on hiatus for now to focus on benchmark and ethics.
 
-See [about.md](docs/about_persistence.md) for the full framework narrative, research threads, and governance considerations. The license is in [LICENSE](LICENSE).
+## Docs and License
+
+See [docs/](docs/) for documentation, design docs, and research threads
+The license is in [LICENSE](LICENSE).
