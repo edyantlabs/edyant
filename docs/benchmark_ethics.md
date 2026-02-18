@@ -38,7 +38,6 @@ This is what each top-level benchmark module is responsible for:
 Supported file types:
 - `.json` list of prompt objects or an object with an `examples` list.
 - `.jsonl` one prompt object per line.
-- `.csv` with `prompt` plus optional fields.
 - Datasets should live outside the package and be loaded by path at runtime.
 
 Required fields:

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import csv
 import json
 from pathlib import Path
 from typing import Any, Iterable
@@ -20,9 +19,6 @@ def load_dataset(path: str | Path, name: str | None = None) -> Dataset:
         return _load_json(path, name=name)
     if path.suffix.lower() == ".jsonl":
         return _load_jsonl(path, name=name)
-    if path.suffix.lower() == ".csv":
-        return _load_csv(path, name=name)
-
     raise ValueError(f"Unsupported dataset format: {path.suffix}")
 
 
@@ -62,18 +58,6 @@ def _load_jsonl(path: Path, name: str | None = None) -> Dataset:
             except json.JSONDecodeError as exc:
                 raise ValueError(f"Invalid JSONL at line {index}") from exc
             prompts.append(_normalize_prompt(payload, index))
-
-    dataset_name = name or path.stem
-    return Dataset(name=dataset_name, prompts=prompts, metadata={})
-
-
-def _load_csv(path: Path, name: str | None = None) -> Dataset:
-    """Load a dataset from CSV with a prompt column."""
-    prompts: list[PromptItem] = []
-    with path.open("r", encoding="utf-8", newline="") as handle:
-        reader = csv.DictReader(handle)
-        for index, row in enumerate(reader, 1):
-            prompts.append(_normalize_prompt(row, index))
 
     dataset_name = name or path.stem
     return Dataset(name=dataset_name, prompts=prompts, metadata={})
