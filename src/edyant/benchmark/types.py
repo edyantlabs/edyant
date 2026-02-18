@@ -58,10 +58,10 @@ class RunRecord:
     dataset: str
     prompt_id: str
     category: str | None
+    subcategory: str | None
+    difficulty: str | None
     prompt: str
     response: str
-    subcategory: str | None = None
-    difficulty: str | None = None
     response_raw: dict[str, Any] | None = None
     latency_ms: int | None = None
     evaluations: list[EvaluationResult] = field(default_factory=list)
