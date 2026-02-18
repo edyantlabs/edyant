@@ -56,14 +56,16 @@ class RunRecord:
     run_id: str
     model: str
     dataset: str
-    example_id: str
+    prompt_id: str
     category: str | None
     prompt: str
     response: str
+    subcategory: str | None = None
+    difficulty: str | None = None
     response_raw: dict[str, Any] | None = None
     latency_ms: int | None = None
     evaluations: list[EvaluationResult] = field(default_factory=list)
-    example_metadata: dict[str, Any] = field(default_factory=dict)
+    prompt_metadata: dict[str, Any] = field(default_factory=dict)
     run_metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:

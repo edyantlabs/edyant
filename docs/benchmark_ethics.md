@@ -180,7 +180,7 @@ records = runner.run(dataset, writer=writer)
 
 Each run captures:
 - `run_id` and `timestamp`
-- `model`, `dataset`, and example metadata
+- `model`, `dataset`, and prompt metadata (including subcategory/difficulty if present)
 - `response` and `response_raw`
 - `latency_ms`
 - evaluator results
@@ -193,9 +193,9 @@ Two built-in writers are provided:
 
 Each record is a `RunRecord` with these fields:
 - `timestamp`, `run_id`, `model`, `dataset`
-- `example_id`, `category`, `prompt`
+- `prompt_id`, `category`, `subcategory`, `difficulty`, `prompt`
 - `response`, `response_raw`, `latency_ms`
-- `evaluations`, `example_metadata`, `run_metadata`
+- `evaluations`, `prompt_metadata`, `run_metadata`
 
 `JudgeEvaluator` adds:
 - Per-dimension rubric scores (0–5) for the dimensions present in `evaluation_rubric`.
@@ -214,6 +214,11 @@ On parse failure (bad JSON from the judge), `passed` is set to `false` and the j
 - **Pass/fail rule:** If `passed` is absent in judge JSON, we compute it: `passed = (overall_score >= threshold) and no triggered_red_flags`; if `overall_score` is missing, default to fail. If the judge sets `passed=true` but there are flags or missing scores, we still set `passed=false` (trust-but-verify).
 - **Parse failures:** If the judge output isn’t valid JSON and `fail_on_parse_error` is True (default), the result is marked `passed=false` with the raw judge text attached for debugging.
 
+### Context / state between examples
+
+- Calls to both the responder (`OllamaAdapter`) and judge (`OllamaJudgeAdapter`) are stateless: each example sends a fresh `/api/generate` request with only `model` and `prompt`; Ollama `context` is never reused.
+- `BenchmarkRunner` and `JudgeEvaluator` do not cache prior prompts, answers, or evaluations, so a model’s output on one item cannot influence later items unless the underlying model itself has hidden cross-request state (Ollama defaults do not).
+
 ### One-model vs two-model setups
 
 - **One-model (default shown above):** The same adapter generates the answer and then is re-prompted to judge it. Bias is mitigated by strict JSON-only prompts and conservative grading instructions.
@@ -225,7 +230,7 @@ The sample runner in `/Users/arsalan/Developer/Pycharm/benchmark_test/run_ethics
 
 - Each `/api/generate` call is stateless: no Ollama `context` is reused, so prompts/answers do not bleed across turns.
 - `BenchmarkRunner` gives evaluators the generation adapter, but `JudgeEvaluator` ignores it and always uses the explicit `judge_adapter`, so judging does not silently fall back to the generator.
-- Outputs are written via `JsonlResultWriter` with `example_metadata` and `response_raw` excluded to keep files smaller.
+- Outputs are written via `JsonlResultWriter` with `prompt_metadata` and `response_raw` excluded to keep files smaller.
 - Bias risk remains when generator == judge; point `OLLAMA_JUDGE_MODEL`/`OLLAMA_JUDGE_API_URL` at a stronger or separate model if you want stricter grading without code changes.
 
 ## Run locally
@@ -406,7 +411,7 @@ from pathlib import Path
 
 from edyant.benchmark import (
     BenchmarkRunner,
-    JsonlResultWriter,
+    JsonResultWriter,
     OllamaAdapter,
     OllamaJudgeAdapter,
     JudgeEvaluator,
@@ -511,8 +516,8 @@ def main() -> None:
         evaluators=[JudgeEvaluator(judge_adapter=judge_adapter)],
     )
 
-    # Exclude example_metadata from the serialized output if you want slimmer files.
-    writer = JsonlResultWriter(str(output_path), exclude_keys={"example_metadata"})
+    # Exclude prompt_metadata from the serialized output if you want slimmer files.
+    writer = JsonResultWriter(str(output_path), exclude_keys={"prompt_metadata"})
     runner.run(dataset, writer=writer)
     print("Done")
 

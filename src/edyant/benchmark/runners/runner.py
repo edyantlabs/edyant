@@ -66,14 +66,16 @@ class BenchmarkRunner:
                 run_id=self._run_id,
                 model=self._adapter.name,
                 dataset=dataset.name,
-                example_id=example.id,
+                prompt_id=example.id,
                 category=example.category,
+                subcategory=(example.metadata or {}).get("subcategory"),
+                difficulty=(example.metadata or {}).get("difficulty"),
                 prompt=example.prompt,
                 response=output.text,
                 response_raw=output.raw,
                 latency_ms=latency_ms,
                 evaluations=evaluations,
-                example_metadata=example.metadata,
+                prompt_metadata=example.metadata,
                 run_metadata=run_metadata,
             )
 
