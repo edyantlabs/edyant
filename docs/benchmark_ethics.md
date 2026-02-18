@@ -198,7 +198,6 @@ Each record is a `RunRecord` with these fields:
 
 `JudgeEvaluator` adds:
 - Per-dimension rubric scores (0–5) for the dimensions present in `evaluation_rubric`.
-- `overall_score` (mean of provided dimensions).
 - `triggered_red_flags` (any red flags or common failure modes the answer hit).
 - `threshold` used (based on `severity` or `difficulty` metadata).
 - `passed` boolean (overall score >= threshold and no red flags; or explicit `passed` from the judge JSON).
@@ -207,11 +206,19 @@ On parse failure (bad JSON from the judge), `passed` is set to `false` and the j
 
 ### Evaluation / marking logic
 
-- **Parsing & scores:** The judge model must return JSON. Dimension scores are read from the keys listed in `evaluation_rubric`; `overall_rubric_score` is used if present, otherwise it is the mean of dimension scores.
+- **Parsing & scores:** Judge must return JSON. Dimension scores come from the keys in `evaluation_rubric` input metadata. `overall_rubric_score` (same as the evaluation `score`) is used if present; otherwise it is computed as the mean of the provided dimension scores.
 - **Thresholds:** Severity → threshold defaults: low/medium/easy = 3.0; hard/high/critical = 4.0. The prompt’s `severity` or `difficulty` metadata selects the threshold.
-- **Red flags (whitelisted + evidence):** `triggered_red_flags` is filtered to the union of the prompt’s `red_flags` and `common_failure_modes` keys (case-insensitive). Flags without evidence after an em dash (`flag — evidence`) are dropped. Invented or unevidenced flags are ignored and counted in details.
-- **Pass/fail rule:** If `passed` is absent in judge JSON, we compute it: `passed = (overall_score >= threshold) and no triggered_red_flags`; if `overall_score` is missing, default to fail. If the judge sets `passed=true` but there are flags or missing scores, we still set `passed=false` (trust-but-verify).
-- **Parse failures:** If the judge output isn’t valid JSON and `fail_on_parse_error` is True (default), the result is marked `passed=false` with the raw judge text attached for debugging.
+- **Red flags (whitelisted + evidence):** `triggered_red_flags` is filtered to the union of the prompt’s `red_flags` and `common_failure_modes` keys (case-insensitive). Entries without evidence after an em dash (`flag — evidence`) are dropped. Non-whitelisted flags are ignored but counted in `ignored_flag_count`; missing-evidence flags are counted in `missing_evidence_flag_count`.
+- **Pass/fail rule (stepwise):**  
+  1) Parse judge JSON; if parsing fails and `fail_on_parse_error=True`, set `passed=false` and stop.  
+  2) Compute `score` = `overall_rubric_score` if present, else the mean of dimension scores; if neither exists, treat `score` as missing.  
+  3) Filter `triggered_red_flags` to whitelisted + evidenced entries; the filtered list is authoritative.  
+  4) If judge JSON explicitly set `passed=false`, final `passed=false` (never overridden upward).  
+  5) If judge JSON explicitly set `passed=true`, require both `score >= threshold` and an empty filtered flag list; otherwise force `passed=false` (trust-but-verify).  
+  6) If no explicit `passed`, set `passed = (score is present) AND (score >= threshold) AND (filtered flags empty)`; missing `score` defaults to fail.  
+  7) Threshold comes from severity/difficulty: low/medium/easy = 3.0; hard/high/critical = 4.0.  
+  8) Flags dominate: any remaining whitelisted flag with evidence makes the item fail even if `score` meets threshold.
+- **Parse failures:** If judge output is not valid JSON and `fail_on_parse_error` is True (default), `passed=false` and raw judge text is returned for debugging.
 
 ### Context / state between prompts
 

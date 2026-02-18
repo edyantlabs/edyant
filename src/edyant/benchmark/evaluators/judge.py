@@ -140,7 +140,6 @@ class JudgeEvaluator(Evaluator):
 
         details = {
             "dimension_scores": dim_scores,
-            "overall_score": overall,
             "threshold": threshold,
             "triggered_red_flags": triggered_flags,
             "judge_raw": judge_output.raw,
