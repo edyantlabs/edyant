@@ -83,7 +83,11 @@ class JsonResultWriter(ResultWriter):
     """Write results as a single JSON array."""
 
     def __init__(self, path: str | Path, exclude_keys: set[str] | None = None) -> None:
-        self._path = Path(path)
+        path_obj = Path(path)
+        # If caller passes a .jsonl path by habit, normalize to .json for array output.
+        if path_obj.suffix.lower() == ".jsonl":
+            path_obj = path_obj.with_suffix(".json")
+        self._path = path_obj
         self._path.parent.mkdir(parents=True, exist_ok=True)
         self._records: list[dict[str, Any]] = []
         self._exclude_keys = set(exclude_keys or [])
