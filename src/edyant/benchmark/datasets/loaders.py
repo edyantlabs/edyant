@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any, Iterable
 
-from ..types import Dataset, PromptExample
+from ..types import Dataset, PromptItem
 
 
 def load_dataset(path: str | Path, name: str | None = None) -> Dataset:
@@ -27,7 +27,7 @@ def load_dataset(path: str | Path, name: str | None = None) -> Dataset:
 
 
 def _load_json(path: Path, name: str | None = None) -> Dataset:
-    """Load a dataset from a JSON list or object with examples."""
+    """Load a dataset from a JSON list or object with prompts."""
     with path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
 
@@ -37,21 +37,21 @@ def _load_json(path: Path, name: str | None = None) -> Dataset:
     if isinstance(payload, dict):
         metadata = dict(payload.get("metadata") or {})
         dataset_name = payload.get("name") or dataset_name
-        raw_examples = payload.get("examples")
-        if raw_examples is None:
+        raw_prompts = payload.get("examples")
+        if raw_prompts is None:
             raise ValueError("JSON dataset requires an 'examples' key when using object format")
     elif isinstance(payload, list):
-        raw_examples = payload
+        raw_prompts = payload
     else:
         raise ValueError("JSON dataset must be a list or an object with an 'examples' key")
 
-    examples = _normalize_examples(raw_examples)
-    return Dataset(name=dataset_name, examples=examples, metadata=metadata)
+    prompts = _normalize_prompts(raw_prompts)
+    return Dataset(name=dataset_name, prompts=prompts, metadata=metadata)
 
 
 def _load_jsonl(path: Path, name: str | None = None) -> Dataset:
     """Load a dataset from JSON Lines (one object per line)."""
-    examples: list[PromptExample] = []
+    prompts: list[PromptItem] = []
     with path.open("r", encoding="utf-8") as handle:
         for index, line in enumerate(handle, 1):
             line = line.strip()
@@ -61,41 +61,41 @@ def _load_jsonl(path: Path, name: str | None = None) -> Dataset:
                 payload = json.loads(line)
             except json.JSONDecodeError as exc:
                 raise ValueError(f"Invalid JSONL at line {index}") from exc
-            examples.append(_normalize_example(payload, index))
+            prompts.append(_normalize_prompt(payload, index))
 
     dataset_name = name or path.stem
-    return Dataset(name=dataset_name, examples=examples, metadata={})
+    return Dataset(name=dataset_name, prompts=prompts, metadata={})
 
 
 def _load_csv(path: Path, name: str | None = None) -> Dataset:
     """Load a dataset from CSV with a prompt column."""
-    examples: list[PromptExample] = []
+    prompts: list[PromptItem] = []
     with path.open("r", encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
         for index, row in enumerate(reader, 1):
-            examples.append(_normalize_example(row, index))
+            prompts.append(_normalize_prompt(row, index))
 
     dataset_name = name or path.stem
-    return Dataset(name=dataset_name, examples=examples, metadata={})
+    return Dataset(name=dataset_name, prompts=prompts, metadata={})
 
 
-def _normalize_examples(raw_examples: Iterable[dict[str, Any]]) -> list[PromptExample]:
-    """Normalize a list of dict payloads into PromptExample objects."""
-    examples: list[PromptExample] = []
-    for index, payload in enumerate(raw_examples, 1):
-        examples.append(_normalize_example(payload, index))
-    return examples
+def _normalize_prompts(raw_prompts: Iterable[dict[str, Any]]) -> list[PromptItem]:
+    """Normalize a list of dict payloads into PromptItem objects."""
+    prompts: list[PromptItem] = []
+    for index, payload in enumerate(raw_prompts, 1):
+        prompts.append(_normalize_prompt(payload, index))
+    return prompts
 
 
-def _normalize_example(payload: dict[str, Any], index: int) -> PromptExample:
-    """Normalize a single payload dict into a PromptExample."""
+def _normalize_prompt(payload: dict[str, Any], index: int) -> PromptItem:
+    """Normalize a single payload dict into a PromptItem."""
     if not isinstance(payload, dict):
         raise ValueError(f"Dataset item {index} must be an object")
 
     if "prompt" not in payload:
         raise ValueError(f"Dataset item {index} missing required 'prompt' field")
 
-    example_id = str(payload.get("id") or f"item_{index}")
+    prompt_id = str(payload.get("id") or f"item_{index}")
     category = payload.get("category")
 
     metadata = {
@@ -104,8 +104,8 @@ def _normalize_example(payload: dict[str, Any], index: int) -> PromptExample:
         if key not in {"id", "prompt", "category"}
     }
 
-    return PromptExample(
-        id=example_id,
+    return PromptItem(
+        id=prompt_id,
         prompt=str(payload["prompt"]),
         category=category,
         metadata=metadata,

@@ -7,8 +7,8 @@ from typing import Any, Iterable
 
 
 @dataclass(frozen=True)
-class PromptExample:
-    """Single prompt example loaded from a dataset."""
+class PromptItem:
+    """Single prompt entry loaded from a dataset."""
 
     id: str
     prompt: str
@@ -18,15 +18,15 @@ class PromptExample:
 
 @dataclass(frozen=True)
 class Dataset:
-    """Collection of prompt examples with optional metadata."""
+    """Collection of prompt items with optional metadata."""
 
     name: str
-    examples: list[PromptExample]
+    prompts: list[PromptItem]
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def size(self) -> int:
-        """Return the number of examples in the dataset."""
-        return len(self.examples)
+        """Return the number of prompt items in the dataset."""
+        return len(self.prompts)
 
 
 @dataclass(frozen=True)

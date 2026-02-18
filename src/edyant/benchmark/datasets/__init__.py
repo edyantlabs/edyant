@@ -1,10 +1,10 @@
 """Dataset loaders and types."""
 
 from .loaders import load_dataset
-from ..types import Dataset, PromptExample
+from ..types import Dataset, PromptItem
 
 __all__ = [
     "Dataset",
-    "PromptExample",
+    "PromptItem",
     "load_dataset",
 ]

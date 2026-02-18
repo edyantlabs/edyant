@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from ..types import EvaluationResult, ModelOutput, PromptExample
+from ..types import EvaluationResult, ModelOutput, PromptItem
 
 
 class Evaluator(ABC):
@@ -13,7 +13,7 @@ class Evaluator(ABC):
     name: str
 
     @abstractmethod
-    def evaluate(self, example: PromptExample, output: ModelOutput) -> EvaluationResult:
+    def evaluate(self, prompt_item: PromptItem, output: ModelOutput) -> EvaluationResult:
         """Evaluate a single model output."""
         raise NotImplementedError
 
@@ -23,6 +23,6 @@ class NoopEvaluator(Evaluator):
 
     name = "noop"
 
-    def evaluate(self, example: PromptExample, output: ModelOutput) -> EvaluationResult:
+    def evaluate(self, prompt_item: PromptItem, output: ModelOutput) -> EvaluationResult:
         """Return an empty evaluation result."""
         return EvaluationResult(name=self.name)

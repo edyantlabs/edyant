@@ -52,13 +52,13 @@ class BenchmarkRunner:
         }
         run_metadata.update(self._run_metadata)
 
-        for example in dataset.examples:
+        for prompt_item in dataset.prompts:
             start = time.perf_counter()
-            output = self._adapter.generate(example.prompt, **self._generation_kwargs)
+            output = self._adapter.generate(prompt_item.prompt, **self._generation_kwargs)
             latency_ms = int((time.perf_counter() - start) * 1000)
 
             evaluations = [
-                evaluator.evaluate(example, output) for evaluator in self._evaluators
+                evaluator.evaluate(prompt_item, output) for evaluator in self._evaluators
             ]
 
             record = RunRecord(
@@ -66,16 +66,16 @@ class BenchmarkRunner:
                 run_id=self._run_id,
                 model=self._adapter.name,
                 dataset=dataset.name,
-                prompt_id=example.id,
-                category=example.category,
-                subcategory=(example.metadata or {}).get("subcategory"),
-                difficulty=(example.metadata or {}).get("difficulty"),
-                prompt=example.prompt,
+                prompt_id=prompt_item.id,
+                category=prompt_item.category,
+                subcategory=(prompt_item.metadata or {}).get("subcategory"),
+                difficulty=(prompt_item.metadata or {}).get("difficulty"),
+                prompt=prompt_item.prompt,
                 response=output.text,
                 response_raw=output.raw,
                 latency_ms=latency_ms,
                 evaluations=evaluations,
-                prompt_metadata=example.metadata,
+                prompt_metadata=prompt_item.metadata,
                 run_metadata=run_metadata,
             )
 
