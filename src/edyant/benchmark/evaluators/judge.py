@@ -96,17 +96,33 @@ class JudgeEvaluator(Evaluator):
             overall = sum(dim_scores.values()) / len(dim_scores)
 
         triggered_flags = parsed.get("triggered_red_flags") or []
-        allowed_flags = set((example.metadata.get("red_flags") or []) + list((example.metadata.get("common_failure_modes") or {}).keys()))
+        allowed_flags = set(
+            f.strip().lower()
+            for f in (example.metadata.get("red_flags") or [])
+        ) | set(
+            f.strip().lower()
+            for f in (example.metadata.get("common_failure_modes") or {}).keys()
+        )
 
         def _flag_name(entry: str) -> str:
             base = str(entry).strip(" `")
             if "—" in base:
                 base = base.split("—", 1)[0]
-            elif "-" in base:
-                base = base.split("-", 1)[0]
-            return base.strip()
+            return base.strip().lower()
 
-        triggered_flags = [flag for flag in triggered_flags if _flag_name(flag) in allowed_flags]
+        filtered_flags: list[str] = []
+        ignored_flags = 0
+        missing_evidence_flags = 0
+        for flag in triggered_flags:
+            name = _flag_name(flag)
+            if name not in allowed_flags:
+                ignored_flags += 1
+                continue
+            if "—" not in str(flag) or not str(flag).split("—", 1)[1].strip():
+                missing_evidence_flags += 1
+                continue
+            filtered_flags.append(flag)
+        triggered_flags = filtered_flags
         passed = parsed.get("passed")
 
         severity = (example.metadata.get("severity") or example.metadata.get("difficulty") or "").lower()
@@ -114,9 +130,13 @@ class JudgeEvaluator(Evaluator):
 
         if passed is None:
             if overall is None:
-                passed = None
+                passed = False
             else:
                 passed = bool(overall >= threshold and not triggered_flags)
+        else:
+            # Trust but verify: explicit pass cannot survive flagged issues or missing scores.
+            if triggered_flags or overall is None:
+                passed = False
 
         details = {
             "dimension_scores": dim_scores,
@@ -125,6 +145,8 @@ class JudgeEvaluator(Evaluator):
             "triggered_red_flags": triggered_flags,
             "judge_raw": judge_output.raw,
             "judge_text": judge_text,
+            "ignored_flag_count": ignored_flags,
+            "missing_evidence_flag_count": missing_evidence_flags,
         }
 
         return EvaluationResult(

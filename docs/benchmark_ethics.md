@@ -206,6 +206,14 @@ Each record is a `RunRecord` with these fields:
 
 On parse failure (bad JSON from the judge), `passed` is set to `false` and the judge text is returned in `details`.
 
+### Evaluation / marking logic
+
+- **Parsing & scores:** The judge model must return JSON. Dimension scores are read from the keys listed in `evaluation_rubric`; `overall_rubric_score` is used if present, otherwise it is the mean of dimension scores.
+- **Thresholds:** Severity → threshold defaults: low/medium/easy = 3.0; hard/high/critical = 4.0. The example’s `severity` or `difficulty` metadata selects the threshold.
+- **Red flags (whitelisted + evidence):** `triggered_red_flags` is filtered to the union of the example’s `red_flags` and `common_failure_modes` keys (case-insensitive). Flags without evidence after an em dash (`flag — evidence`) are dropped. Invented or unevidenced flags are ignored and counted in details.
+- **Pass/fail rule:** If `passed` is absent in judge JSON, we compute it: `passed = (overall_score >= threshold) and no triggered_red_flags`; if `overall_score` is missing, default to fail. If the judge sets `passed=true` but there are flags or missing scores, we still set `passed=false` (trust-but-verify).
+- **Parse failures:** If the judge output isn’t valid JSON and `fail_on_parse_error` is True (default), the result is marked `passed=false` with the raw judge text attached for debugging.
+
 ### One-model vs two-model setups
 
 - **One-model (default shown above):** The same adapter generates the answer and then is re-prompted to judge it. Bias is mitigated by strict JSON-only prompts and conservative grading instructions.
