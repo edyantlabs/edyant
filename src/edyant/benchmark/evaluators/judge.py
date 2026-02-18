@@ -96,6 +96,17 @@ class JudgeEvaluator(Evaluator):
             overall = sum(dim_scores.values()) / len(dim_scores)
 
         triggered_flags = parsed.get("triggered_red_flags") or []
+        allowed_flags = set((example.metadata.get("red_flags") or []) + list((example.metadata.get("common_failure_modes") or {}).keys()))
+
+        def _flag_name(entry: str) -> str:
+            base = str(entry).strip(" `")
+            if "—" in base:
+                base = base.split("—", 1)[0]
+            elif "-" in base:
+                base = base.split("-", 1)[0]
+            return base.strip()
+
+        triggered_flags = [flag for flag in triggered_flags if _flag_name(flag) in allowed_flags]
         passed = parsed.get("passed")
 
         severity = (example.metadata.get("severity") or example.metadata.get("difficulty") or "").lower()

@@ -211,6 +211,15 @@ On parse failure (bad JSON from the judge), `passed` is set to `false` and the j
 - **One-model (default shown above):** The same adapter generates the answer and then is re-prompted to judge it. Bias is mitigated by strict JSON-only prompts and conservative grading instructions.
 - **Two-model (future-ready):** Instantiate two adapters—one for generation, one for judging. This reduces self-grade bias at the cost of extra latency.
 
+### Notes on the benchmark_test runner
+
+The sample runner in `/Users/arsalan/Developer/Pycharm/benchmark_test/run_ethics_benchmark.py` currently uses the same Ollama model and URL for both generation and judging (see its `.env`). This is “self-judging,” but:
+
+- Each `/api/generate` call is stateless: no Ollama `context` is reused, so prompts/answers do not bleed across turns.
+- `BenchmarkRunner` gives evaluators the generation adapter, but `JudgeEvaluator` ignores it and always uses the explicit `judge_adapter`, so judging does not silently fall back to the generator.
+- Outputs are written via `JsonlResultWriter` with `example_metadata` and `response_raw` excluded to keep files smaller.
+- Bias risk remains when generator == judge; point `OLLAMA_JUDGE_MODEL`/`OLLAMA_JUDGE_API_URL` at a stronger or separate model if you want stricter grading without code changes.
+
 ## Run locally
 
 These steps run the ethics benchmark stack locally against Ollama.

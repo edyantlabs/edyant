@@ -16,9 +16,9 @@ research
 /.idea/persistence.iml
 /.idea/edyant.iml
 /.idea/.name
-
-# Ignore the inspection profiles, which contain code analysis settings for JetBrains IDEs
 /.idea/inspectionProfiles/profiles_settings.xml
+
+*.pyc
 
 # virtual environment for Python projects
 .venv
