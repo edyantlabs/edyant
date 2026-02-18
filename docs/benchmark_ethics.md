@@ -133,7 +133,7 @@ adapter = OllamaAdapter(
 )
 ```
 
-To integrate other providers, create a new adapter that implements `generate(prompt, **kwargs)` and returns `ModelOutput`.
+To integrate other providers, create a new adapter that implements `generate(prompt, **kwargs)` and returns `ModelOutput` (see `edyant.persistence.types`).
 
 ## Evaluators
 
