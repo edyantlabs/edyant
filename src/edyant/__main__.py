@@ -21,10 +21,12 @@ from urllib import request
 
 from edyant.persistence import MemoryAugmentedAdapter, SqliteMemoryStore
 from edyant.persistence.adapters import OllamaAdapter
+from edyant.persistence.memorygraph.server import GraphConfig, run_memorygraph_server
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 11434
 DEFAULT_STORE = Path.home() / ".edyant" / "persistence" / "memory.sqlite"
+DEFAULT_GRAPH_PORT = 8787
 
 
 def _check_ollama(url: str, timeout: float = 1.0) -> bool:
@@ -119,6 +121,19 @@ def _handle_run(args: argparse.Namespace) -> None:
         if started_proc:
             started_proc.terminate()
 
+def _handle_memorygraph(args: argparse.Namespace) -> None:
+    cfg = GraphConfig(
+        store=args.store,
+        host=args.host,
+        port=args.port,
+        max_edges=args.max_edges,
+        open_browser=args.open_browser,
+    )
+    print(f"[edyant] memorygraph serving {cfg.store} at http://{cfg.host}:{cfg.port}/")
+    if cfg.open_browser:
+        print("[edyant] opening browser...")
+    run_memorygraph_server(cfg)
+
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="edyant")
@@ -147,6 +162,14 @@ def _parser() -> argparse.ArgumentParser:
     p_prompt.add_argument("--url", required=False, default=None, help="Ollama API URL (or OLLAMA_API_URL env)")
     p_prompt.add_argument("prompt", nargs="?", help="Prompt text or stdin")
     p_prompt.set_defaults(func=_handle_prompt)
+
+    p_graph = sub.add_parser("memorygraph", help="Launch a graph viz UI for the persistence store")
+    p_graph.add_argument("--store", type=Path, default=DEFAULT_STORE, help="Path to SQLite store file")
+    p_graph.add_argument("--host", default="127.0.0.1", help="Bind host for the viewer")
+    p_graph.add_argument("--port", type=int, default=DEFAULT_GRAPH_PORT, help="Bind port for the viewer")
+    p_graph.add_argument("--max-edges", type=int, default=500, help="Max edges in the initial summary")
+    p_graph.add_argument("--open-browser", action="store_true", help="Open browser automatically")
+    p_graph.set_defaults(func=_handle_memorygraph)
 
     return parser
 

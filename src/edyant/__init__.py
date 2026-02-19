@@ -14,6 +14,4 @@ __all__ = [
     "core",
     "ethics",
     "persistence",
-    "persona",
-    "umwelt",
 ]

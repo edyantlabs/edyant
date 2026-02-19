@@ -15,12 +15,13 @@ Semantic memory layer for LLM systems that keeps working context, learns from ou
 - `src/edyant/persistence/storage/sqlite_store.py`: SQLite-backed `MemoryStore` with lightweight spreading activation.
 - `src/edyant/persistence/config.py`: `default_data_dir()` resolver (`EDYANT_DATA_DIR` → `XDG_DATA_HOME` → `~/.local/share/edyant/persistence`).
 - `src/edyant/persistence/__init__.py`: exports all of the above for consumers.
+- `src/edyant/persistence/memorygraph/`: lightweight HTTP/D3 viewer for the memory graph.
 
 ## Storage responsibility
 - The framework never writes inside the repo. Callers choose the path/volume (CLI default: `~/.edyant/persistence/memory.sqlite`):
   ```python
-  from edyant.persistence import SqliteMemoryStore, default_data_dir
-  store = SqliteMemoryStore(default_data_dir() / "graph.sqlite")
+  from edyant.persistence import SqliteMemoryStore
+  store = SqliteMemoryStore(Path.home() / ".edyant" / "persistence" / "memory.sqlite")
   ```
 - Tests: use tempdirs or `NullMemoryStore`.
 
@@ -64,6 +65,14 @@ python -m edyant prompt \
 ```
 
 Defaults: `--store` falls back to `~/.edyant/persistence/memory.sqlite`; model/URL fall back to `OLLAMA_MODEL` and `OLLAMA_API_URL` if flags are omitted.
+
+### Memory graph viewer
+```
+python -m edyant memorygraph --store ~/.edyant/persistence/memory.sqlite --open-browser
+```
+- Serves a force-directed D3 view from the SQLite store on `http://127.0.0.1:8787/` (configurable).
+- Dynamic: summary backbone on load; double-click or zoom-in to fetch neighbors on demand.
+- See `docs/persistence_memorygraph.md` for API shape and controls.
 
 ## Configuration knobs
 - `context_k`: number of hits injected into the prompt (default 5).
