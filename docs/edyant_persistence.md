@@ -10,14 +10,14 @@ Semantic memory layer for LLM systems that keeps working context, learns from ou
 ## Package map
 - `src/edyant/persistence/api.py`: public interfaces (`MemoryStore`, `MemoryHit`, `Episode`, `NullMemoryStore`).
 - `src/edyant/persistence/types.py`: model IO type used by persistence (`ModelOutput`).
-- `src/edyant/persistence/adapters/`: provider adapters + registry (`ModelAdapter`, `register_adapter`, `create_adapter`, `OllamaAdapter`, `OllamaJudgeAdapter`).
+- `src/edyant/persistence/adapters/`: provider adapters + registry (`ModelAdapter`, `register_adapter`, `create_adapter`, `OllamaAdapter`).
 - `src/edyant/persistence/memory_adapter.py`: `MemoryAugmentedAdapter` that wraps any `ModelAdapter` with retrieve/store hooks.
 - `src/edyant/persistence/storage/sqlite_store.py`: SQLite-backed `MemoryStore` with lightweight spreading activation.
 - `src/edyant/persistence/config.py`: `default_data_dir()` resolver (`EDYANT_DATA_DIR` → `XDG_DATA_HOME` → `~/.local/share/edyant/persistence`).
 - `src/edyant/persistence/__init__.py`: exports all of the above for consumers.
 
 ## Storage responsibility
-- The framework never writes inside the repo. Callers choose the path/volume:
+- The framework never writes inside the repo. Callers choose the path/volume (CLI default: `~/.edyant/persistence/memory.sqlite`):
   ```python
   from edyant.persistence import SqliteMemoryStore, default_data_dir
   store = SqliteMemoryStore(default_data_dir() / "graph.sqlite")
@@ -43,8 +43,13 @@ Semantic memory layer for LLM systems that keeps working context, learns from ou
 
 Interactive REPL that auto-starts `ollama serve` if needed and persists context:
 ```
-python -m edyant.persistence.cli run llama3 \
-  --store ~/.edyant/persistence/graph.sqlite
+python -m edyant run qwen2.5:3b
+```
+Can define custom memory store
+
+```
+python -m edyant run qwen2.5:3b \
+  --store ~/.edyant/persistence/memory.sqlite
 ```
 - If ollama isn’t running, it launches `ollama serve` locally and waits up to 8s.
 - Each turn uses `MemoryAugmentedAdapter` so prompts/responses are stored in the SQLite graph.
@@ -52,13 +57,13 @@ python -m edyant.persistence.cli run llama3 \
 
 Single-shot without a daemon (opens store, runs once, exits):
 ```
-python -m edyant.persistence.cli prompt \
+python -m edyant prompt \
   --model llama3 \
   --url http://localhost:11434/api/generate \
   "Summarize today's meeting notes."
 ```
 
-Defaults: `--store` falls back to `EDYANT_DATA_DIR` or `~/.local/share/edyant/persistence/graph.sqlite`; model/URL fall back to `OLLAMA_MODEL` and `OLLAMA_API_URL` if flags are omitted.
+Defaults: `--store` falls back to `~/.edyant/persistence/memory.sqlite`; model/URL fall back to `OLLAMA_MODEL` and `OLLAMA_API_URL` if flags are omitted.
 
 ## Configuration knobs
 - `context_k`: number of hits injected into the prompt (default 5).
@@ -66,7 +71,7 @@ Defaults: `--store` falls back to `EDYANT_DATA_DIR` or `~/.local/share/edyant/pe
 - `SqliteMemoryStore` pragmas: WAL enabled by default; schema auto-created.
 
 ## Data format examples
-- **Episode metadata**: `{ "adapter": "ollama", "run_id": "...", "judge_score": 0.72 }`
+- **Episode metadata**: `{ "adapter": "ollama", "run_id": "..."}`
 - **MemoryHit metadata**: anything stored with the node (e.g., dataset tags, user id).
 
 ## Operational guidance
@@ -78,11 +83,6 @@ Defaults: `--store` falls back to `EDYANT_DATA_DIR` or `~/.local/share/edyant/pe
 - Add embedding-aware candidate generation and hybrid scoring.
 - Background summarization/decay jobs (`persistence/jobs/` placeholder).
 - CLI utilities under `persistence/cli` for inspect/compact/export.
-
-## Relation to the conceptual framework
 - **Episodic**: nodes table.
 - **Semantic**: emerges via edge topology; future embeddings/rules will strengthen this layer.
 - **Procedural**: edge weight updates from successful/failed outcomes.
-
-## Similar works
-- Mem0, Memento MCP (see comparisons in `docs/about_persistence.md`); key differentiator here is outcome-driven edge updates plus procedural memory in topology.
