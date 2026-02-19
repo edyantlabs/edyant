@@ -17,6 +17,7 @@ research
 /.idea/edyant.iml
 /.idea/.name
 /.idea/inspectionProfiles/profiles_settings.xml
+/.idea/dataSources.xml
 
 *.pyc
 

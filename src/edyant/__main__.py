@@ -130,6 +130,7 @@ def _handle_memorygraph(args: argparse.Namespace) -> None:
         open_browser=args.open_browser,
     )
     print(f"[edyant] memorygraph serving {cfg.store} at http://{cfg.host}:{cfg.port}/")
+    print(f"[edyant] Press Ctrl+C to stop. ")
     if cfg.open_browser:
         print("[edyant] opening browser...")
     run_memorygraph_server(cfg)
