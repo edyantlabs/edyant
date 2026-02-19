@@ -9,7 +9,7 @@ from .base import (
     lazy_register,
     register_adapter,
 )
-from .ollama import OllamaAdapter, OllamaJudgeAdapter
+from .ollama import OllamaAdapter
 
 __all__ = [
     "AdapterError",
@@ -20,5 +20,4 @@ __all__ = [
     "lazy_register",
     "register_adapter",
     "OllamaAdapter",
-    "OllamaJudgeAdapter",
 ]
