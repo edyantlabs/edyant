@@ -16,6 +16,7 @@ Options:
 - `--port` (default `8787`): bind port.
 - `--max-edges` (default `500`): maximum edges returned in the initial summary/backbone.
 - `--open-browser`: auto-launch your browser to the viewer URL.
+- Ctrl+C cleanly stops the server and frees the port.
 
 ## What it does
 - Starts a lightweight HTTP server (no extra deps) serving:

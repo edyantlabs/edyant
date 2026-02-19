@@ -6,8 +6,6 @@ from __future__ import annotations
 
 import json
 import sqlite3
-import threading
-import time
 import webbrowser
 from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -32,14 +30,14 @@ HTML_PAGE = r"""
   <meta charset="utf-8" />
   <title>edyant Memory Graph</title>
   <style>
-    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #0b1021; color: #e8ecf1; }
-    #topbar { padding: 10px 12px; background: #11172b; border-bottom: 1px solid #1f2740; display: flex; gap: 10px; align-items: center; }
+    body { margin: 0; font-family: "Helvetica Neue", Arial, sans-serif; background: #eaf2f8; color: #1f2a44; }
+    #topbar { padding: 10px 12px; background: #d7e3ef; border-bottom: 1px solid #c3ceda; display: flex; gap: 10px; align-items: center; }
     #graph { width: 100vw; height: calc(100vh - 48px); }
     button, input[type="range"] { cursor: pointer; }
-    .node { stroke: #111; stroke-width: 0.5px; }
-    .link { stroke: rgba(180,200,255,0.3); }
-    .label { fill: #cbd5e1; font-size: 10px; pointer-events: none; }
-    .tooltip { position: fixed; padding: 8px 10px; background: rgba(10,10,14,0.9); color: #eaeef5; border: 1px solid #334155; border-radius: 6px; font-size: 12px; max-width: 360px; z-index: 10; pointer-events: none; display: none; }
+    .node { stroke: #f0f4f8; stroke-width: 0.5px; }
+    .link { stroke: rgba(80,115,160,0.35); }
+    .label { fill: #3c4a63; font-size: 10px; pointer-events: none; }
+    .tooltip { position: fixed; padding: 8px 10px; background: rgba(255,255,255,0.95); color: #1f2a44; border: 1px solid #c3ceda; border-radius: 6px; font-size: 12px; max-width: 360px; z-index: 10; pointer-events: none; display: none; box-shadow: 0 6px 18px rgba(31,42,68,0.12); }
   </style>
 </head>
 <body>
@@ -319,18 +317,13 @@ def run_memorygraph_server(cfg: GraphConfig) -> None:
     server = ThreadingHTTPServer((cfg.host, cfg.port), handler_cls)
     url = f"http://{cfg.host}:{cfg.port}/"
 
-    def serve():
-        server.serve_forever()
-
-    thread = threading.Thread(target=serve, daemon=True)
-    thread.start()
-
     if cfg.open_browser:
         webbrowser.open(url)
 
     try:
-        while thread.is_alive():
-            time.sleep(0.5)
+        server.serve_forever()
     except KeyboardInterrupt:
+        pass
+    finally:
         server.shutdown()
         server.server_close()
