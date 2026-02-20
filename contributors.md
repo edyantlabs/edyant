@@ -12,4 +12,11 @@ Please provide your name in alphabetical order, as follows:
 - Domain: benchmark.ethics
 ---
 
+---
+- Name: https://github.com/nitinbhoyate-iitj
+- GitHub: [nitinbhoyate-iitj](https://github.com/nitinbhoyate-iitj)
+- Role: Develop
+- Domain: benchmark.ethics / edyant.ethics
+---
+
 
