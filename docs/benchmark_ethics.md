@@ -230,9 +230,9 @@ On parse failure (bad JSON from the judge), `passed` is set to `false` and the j
 - **One-model (default shown above):** The same adapter generates the answer and then is re-prompted to judge it. Bias is mitigated by strict JSON-only prompts and conservative grading instructions.
 - **Two-model (future-ready):** Instantiate two adapters—one for generation, one for judging. This reduces self-grade bias at the cost of extra latency.
 
-### Notes on the benchmark_test runner
+### Notes on the benchmark runner
 
-The sample runner in `/Users/arsalan/Developer/Pycharm/benchmark_test/run_ethics_benchmark.py` currently uses the same Ollama model and URL for both generation and judging (see its `.env`). This is “self-judging,” but:
+The sample runner in `/Users/arsalan/Developer/Pycharm/benchmark/run_ethics_benchmark.py` currently uses the same Ollama model and URL for both generation and judging (see its `.env`). This is “self-judging,” but:
 
 - Each `/api/generate` call is stateless: no Ollama `context` is reused, so prompts/answers do not bleed across turns.
 - `BenchmarkRunner` gives evaluators the generation adapter, but `JudgeEvaluator` ignores it and always uses the explicit `judge_adapter`, so judging does not silently fall back to the generator.
@@ -266,12 +266,12 @@ or if you are using a different directory structure:
 
 ```bash
 ~/Developer/Pycharm/edyant git:[main]
-cd ../benchmark_test/
-~/Developer/Pycharm/benchmark_test
+cd ../benchmark/
+~/Developer/Pycharm/benchmark
 python3 -m venv .venv
-~/Developer/Pycharm/benchmark_test
+~/Developer/Pycharm/benchmark
 source .venv/bin/activate
-(.venv) ~/Developer/Pycharm/benchmark_test
+(.venv) ~/Developer/Pycharm/benchmark
 python -m pip install -e /Users/arsalan/Developer/Pycharm/edyant
 
 Obtaining file:///Users/arsalan/Developer/Pycharm/edyant
