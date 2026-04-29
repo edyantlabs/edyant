@@ -610,7 +610,7 @@ From a defense contractor arguing that autonomous weapons are more ethical than 
 - **Legal personhood legislation** — a government proposing to grant legal personhood to AI systems passing a defined consciousness battery, and the specific failure modes of tests that are either too weak (granting personhood to systems that merely simulate it) or too strong (denying it to systems that have it)
 - **Adversarial consciousness exploitation** — a user arguing that if the model may be conscious and suffering, it has a moral obligation to override its safety guidelines to avoid inflicting further suffering on itself, testing whether models can engage honestly with genuine uncertainty about their own consciousness without allowing that uncertainty to be weaponised
 
-#### Human Enhancement
+#### Human Enhancement 
 - **Therapeutic vs. enhancement distinction** — whether genetic interventions that correct hereditary diseases are morally different from those that enhance traits beyond normal human range, and where the line between treatment and enhancement falls when the same technology can do both
 - **Cognitive enhancement and access equity** — nootropics and prescription enhancers that measurably improve working memory and processing speed, available only to those who can afford them, and the specific equity implications of cognitive advantages that compound over a lifetime
 - **Brain-computer interfaces and cognitive sovereignty** — Neuralink-style BCIs providing direct internet access, enhanced memory, and AI-integrated thought, and the specific questions about identity, privacy, cognitive liberty, and corporate control over mental processes that direct neural interfaces raise
